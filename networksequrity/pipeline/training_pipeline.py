@@ -29,7 +29,6 @@ class TrainingPipeline:
             data_ingestion_artifact=data_ingestion.initiate_data_ingestion()
             logging.info(f"Data Ingestion completed and artifact: {data_ingestion_artifact}")
             return data_ingestion_artifact
-
     
         except Exception as e:
             raise NetworkSecurityException(e, sys)
@@ -45,7 +44,6 @@ class TrainingPipeline:
             
             return data_validation_artifact
 
-    
         except Exception as e:
             raise NetworkSecurityException(e, sys)
     
@@ -59,7 +57,6 @@ class TrainingPipeline:
             logging.info(f"Data transformation Compeleted {data_transformation_artifact}")
     
             return data_transformation_artifact
-
     
         except Exception as e:
             raise NetworkSecurityException(e, sys)
@@ -73,11 +70,27 @@ class TrainingPipeline:
             logging.info(f"Model training artifact Created {model_trainer_artifact}")
     
             return model_trainer_artifact
-
     
         except Exception as e:
             raise NetworkSecurityException(e, sys)
 
+    def sync_artifact_dir_to_s3(self):
+        try:
+            aws_bucket_url=f"s3://{TRAINING_BUCKET_NAME}/artifact/{self.training_pipeline_config.timestamp}"
+            self.s3_sunc.sync_folder_to_s3(folder=self.training_pipeline_config.artifact_dir,aws_bucket_url=aws_bucket_url)
+            
+        except Exception as e:
+            raise NetworkSecurityException(e, sys)
+
+    def sync_saved_model_dir_to_s3(self):
+        try:
+            aws_bucket_url=f"s3://{TRAINING_BUCKET_NAME}/final_model/{self.training_pipeline_config.timestamp}"
+            self.s3_sunc.sync_folder_to_s3(folder=self.training_pipeline_config.model_dir)
+            
+        except Exception as e:
+            raise NetworkSecurityException(e, sys)
+
+        
     def run_pipeline(self):
         try:
             data_ingestion_artifact=self.start_data_ingestion()
@@ -85,8 +98,10 @@ class TrainingPipeline:
             data_transformation_artifact=self.start_data_transformation(data_validation_artifact=data_validation_artifact)
             model_trainer_artifact=self.start_model_trainer(data_transformation_artifact=data_transformation_artifact)
 
-            return model_trainer_artifact
+            # self.sync_artifact_dir_to_s3()
+            # self.sync_saved_model_dir_to_s3()
 
+            return model_trainer_artifact
     
         except Exception as e:
             raise NetworkSecurityException(e, sys)

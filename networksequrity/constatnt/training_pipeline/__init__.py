@@ -18,6 +18,8 @@ SAVED_MODEL_DIR=os.path.join("saved_models")
 
 MODEL_FILE_NAME="model.pkl"
 
+TRAINING_BUCKET_NAME="networksequrity"
+
 DATA_INGESTION_COLLECTION_NAME: str = "NetworkData"
 DATA_INGESTION_DATABASE_NAME: str = "DATABASE"
 DATA_INGESTION_DIR_NAME: str = "data_ingestion"
